@@ -1,33 +1,1139 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="扣子编程，你的 AI 开发伙伴已就位" />
-    <title>扣子编程 - AI 开发伙伴</title>
-    <link rel="stylesheet" href="/styles/main.css" />
-  </head>
-  <body>
-    <div id="app">
-      <main class="main-wrapper">
-        <div class="content-container">
-          <img
-            src="https://lf-coze-web-cdn.coze.cn/obj/eden-cn/lm-lgvj/ljhwZthlaukjlkulzlp/coze-coding/icon/coze-coding.gif"
-            alt="扣子编程 Logo"
-            class="logo-image"
-          />
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link href="https://lf-code-agent.coze.cn/obj/x-ai-cn/fonts/google/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+
+  <script src="https://lf-code-agent.coze.cn/obj/x-ai-cn/cdn/jquery/jquery-3.7.1.min.js"></script>
+  <script src="https://lf-code-agent.coze.cn/obj/x-ai-cn/cdn/lucide/lucide-1.11.0.min.js"></script>
+  <script src="https://lf-code-agent.coze.cn/obj/x-ai-cn/cdn/tailwindcss/tailwindcss-browser-4.2.4.min.js"></script>
+
+  <style type="text/tailwindcss">
+    @theme {
+      /* === 品牌色 === */
+      --color-primary:              #2DD4BF;
+      --color-primary-container:    #134E4A;
+      --color-on-primary:           #042F2E;
+      /* === 背景 / 表面 === */
+      --color-background:                 #0F172A;
+      --color-surface-container-lowest:   #1E293B;
+      --color-surface:                    #1E293B;
+      --color-surface-container:          #334155;
+      --color-surface-container-high:     #475569;
+      --color-surface-container-highest:  #64748B;
+      /* === 文字 === */
+      --color-on-surface:           #F1F5F9;
+      --color-on-surface-variant:   #94A3B8;
+      /* === 功能色 === */
+      --color-success:  #34D399;
+      --color-error:    #F87171;
+      --color-warning:  #FBBF24;
+      /* === 边框 === */
+      --color-outline:          #475569;
+      --color-outline-variant:  #334155;
+      /* === 圆角 === */
+      --radius-sm:   0.375rem;
+      --radius-md:   0.5rem;
+      --radius-lg:   0.75rem;
+      --radius-xl:   1rem;
+      --radius-2xl:  1.5rem;
+      --radius-full: 9999px;
+      /* === 阴影 === */
+      --shadow-card:   0 2px 8px rgba(0,0,0,0.3);
+      --shadow-float:  0 10px 25px rgba(0,0,0,0.4);
+      --shadow-dialog: 0 25px 50px rgba(0,0,0,0.5);
+      /* === 字体 === */
+      --font-sans: "Space Grotesk", "Noto Sans SC", system-ui, sans-serif;
+    }
+  </style>
+
+  <style>
+    canvas { display: block; }
+    .slider-label { font-variant-numeric: tabular-nums; }
+  </style>
+
+  <!-- 图片兜底 -->
+  <script>
+    document.addEventListener('error', function (e) {
+      const img = e.target;
+      if (img.tagName !== 'IMG' || img.dataset.fallback) return;
+      img.dataset.fallback = '1';
+      const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const cat = img.getAttribute('data-category') || '其他';
+      const alt = img.getAttribute('alt') || '';
+      const label = esc(alt.length > 8 ? alt.slice(0, 8) + '…' : alt);
+      const icons = { '人物': '👤', '自然风景': '🏞', '动物': '🐾', '建筑城市': '🏙', '运动体育': '⚽', '交通工具': '🚗', '食物': '🍽', '服饰时尚': '👗', '商业科技': '💼', '游戏娱乐': '🎮', '艺术': '🎨', '其他': '🖼' };
+      const icon = icons[cat] || '🖼';
+      const w = img.width || 400, h = img.height || 300;
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><rect width="100%" height="100%" fill="%23f3f4f6"/><text x="50%" y="45%" text-anchor="middle" font-size="${Math.min(w, h) * 0.18}" dominant-baseline="central">${icon}</text><text x="50%" y="68%" text-anchor="middle" font-size="${Math.min(w, h) * 0.07}" fill="%239ca3af" font-family="system-ui,sans-serif" dominant-baseline="central">${label}</text></svg>`;
+      img.src = 'data:image/svg+xml,' + svg;
+    }, true);
+  </script>
+</head>
+
+<body class="bg-background text-on-surface font-sans">
+
+  <!-- @nav:start 导航组件 -->
+  <header class="bg-surface sticky top-0 z-40 h-14 flex items-center border-b border-outline-variant/20">
+    <div class="w-full max-w-7xl mx-auto px-6 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center">
+          <i data-lucide="brain" class="text-primary w-4.5 h-4.5"></i>
+        </div>
+        <span class="font-bold text-lg tracking-tight">LogiReg Lab</span>
+        <span class="text-xs text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-full">互动教学</span>
+      </div>
+      <nav class="flex items-center gap-2">
+        <a href="home.html" class="px-3 py-1.5 text-sm font-medium text-primary bg-primary/10 rounded-md" aria-current="page">实验场</a>
+      </nav>
+    </div>
+  </header>
+  <!-- @nav:end 导航组件 -->
+
+  <!-- @main-content:start -->
+  <main class="max-w-7xl mx-auto px-6 py-6 space-y-8">
+
+    <!-- 英雄区域 -->
+    <section class="rounded-xl p-8 text-center" style="background: linear-gradient(135deg, #134E4A 0%, #1E293B 50%, #1E3A5F 100%);">
+      <h1 class="text-3xl font-bold text-on-surface mb-2">逻辑回归互动实验室</h1>
+      <p class="text-base text-on-surface-variant">亲手调参、亲眼见证分类边界的诞生</p>
+    </section>
+
+    <!-- 散点图 + 调参面板 并排 -->
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+
+      <!-- 模块一：散点图 Playground -->
+      <section id="scatter-section" class="lg:col-span-3 bg-surface rounded-xl shadow-card p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-base font-semibold text-on-surface">你来画数据</h2>
+          <div id="sample-count" class="text-xs text-on-surface-variant bg-surface-container px-3 py-1 rounded-full">
+            良性 0 个 / 恶性 0 个
+          </div>
+        </div>
+        <!-- 预设按钮 -->
+        <div class="flex gap-2 mb-3">
+          <button id="btn-linear" class="bg-surface-container text-on-surface px-3 py-1.5 rounded-md text-xs font-medium hover:bg-surface-container-high active:scale-[0.98] transition-all">线性可分</button>
+          <button id="btn-nonlinear" class="bg-surface-container text-on-surface px-3 py-1.5 rounded-md text-xs font-medium hover:bg-surface-container-high active:scale-[0.98] transition-all">非线性</button>
+          <button id="btn-imbalanced" class="bg-surface-container text-on-surface px-3 py-1.5 rounded-md text-xs font-medium hover:bg-surface-container-high active:scale-[0.98] transition-all">不平衡</button>
+        </div>
+        <!-- Canvas 散点图 -->
+        <div class="relative rounded-lg overflow-hidden bg-surface-container-lowest">
+          <canvas id="scatter-canvas" width="560" height="420"></canvas>
+        </div>
+        <p class="text-xs text-on-surface-variant mt-2">左键点击添加良性样本，右键点击添加恶性样本</p>
+      </section>
+
+      <!-- 模块二：手动调参面板 -->
+      <section id="param-section" class="lg:col-span-2 bg-surface rounded-xl shadow-card p-5 flex flex-col">
+        <h2 class="text-base font-semibold text-on-surface mb-4">感受权重的作用</h2>
+
+        <!-- w1 滑块 -->
+        <div class="mb-4">
+          <div class="flex justify-between items-center mb-1">
+            <label for="slider-w1" class="text-sm text-on-surface">w1（肿瘤大小权重）</label>
+            <span id="val-w1" class="text-sm font-semibold text-primary slider-label">0.50</span>
+          </div>
+          <input id="slider-w1" type="range" min="-5" max="5" step="0.01" value="0.5"
+                 class="w-full h-2 rounded-full appearance-none bg-surface-container cursor-pointer accent-primary" />
+        </div>
+
+        <!-- w2 滑块 -->
+        <div class="mb-4">
+          <div class="flex justify-between items-center mb-1">
+            <label for="slider-w2" class="text-sm text-on-surface">w2（患者年龄权重）</label>
+            <span id="val-w2" class="text-sm font-semibold text-primary slider-label">-0.50</span>
+          </div>
+          <input id="slider-w2" type="range" min="-5" max="5" step="0.01" value="-0.5"
+                 class="w-full h-2 rounded-full appearance-none bg-surface-container cursor-pointer accent-primary" />
+        </div>
+
+        <!-- b 滑块 -->
+        <div class="mb-4">
+          <div class="flex justify-between items-center mb-1">
+            <label for="slider-b" class="text-sm text-on-surface">b（偏置）</label>
+            <span id="val-b" class="text-sm font-semibold text-primary slider-label">0.00</span>
+          </div>
+          <input id="slider-b" type="range" min="-10" max="10" step="0.01" value="0"
+                 class="w-full h-2 rounded-full appearance-none bg-surface-container cursor-pointer accent-primary" />
+        </div>
+
+        <!-- 当前指标 -->
+        <div class="bg-surface-container-lowest rounded-lg p-3 mb-4">
+          <div class="flex justify-between mb-1">
+            <span class="text-xs text-on-surface-variant">准确率</span>
+            <span id="current-accuracy" class="text-sm font-semibold text-success slider-label">50.00%</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-xs text-on-surface-variant">交叉熵损失</span>
+            <span id="current-loss" class="text-sm font-semibold text-warning slider-label">0.6931</span>
+          </div>
+        </div>
+
+        <!-- 按钮组 -->
+        <div class="flex gap-3 mt-auto">
+          <button id="btn-reset-params" class="flex-1 bg-surface-container text-on-surface px-4 py-2.5 rounded-md text-sm font-medium hover:bg-surface-container-high active:scale-[0.98] transition-all">重置参数</button>
+          <button id="btn-start-train" class="flex-1 bg-primary text-on-primary px-4 py-2.5 rounded-md text-sm font-bold hover:opacity-90 active:scale-[0.98] transition-all">开始训练</button>
+        </div>
+      </section>
+    </div>
+
+    <!-- 模块三：梯度下降训练动画 -->
+    <section id="training-section" class="bg-surface rounded-xl shadow-card p-5">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-base font-semibold text-on-surface">看梯度下降怎么下山</h2>
+        <div id="training-status" class="text-xs text-on-surface-variant">等待训练</div>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- 损失曲线 -->
+        <div class="lg:col-span-2">
+          <div class="rounded-lg overflow-hidden bg-surface-container-lowest">
+            <canvas id="loss-canvas" width="600" height="280"></canvas>
+          </div>
+        </div>
+        <!-- 学习率 + 最终指标 -->
+        <div class="flex flex-col gap-4">
           <div>
-            <div class="text-container">
-              <h1 class="heading">
-                应用开发中
-              </h1>
-              <p class="description">
-                请稍后，页面即将呈现
-              </p>
+            <p class="text-sm text-on-surface mb-2">学习率</p>
+            <div class="space-y-2">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="learning-rate" value="0.01" class="accent-primary" />
+                <span class="text-sm text-on-surface">0.01 慢速</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="learning-rate" value="0.1" checked class="accent-primary" />
+                <span class="text-sm text-on-surface">0.1 适中</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="learning-rate" value="1.0" class="accent-primary" />
+                <span class="text-sm text-on-surface">1.0 快速</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="learning-rate" value="5.0" class="accent-primary" />
+                <span class="text-sm text-on-surface">5.0 过快</span>
+              </label>
+            </div>
+          </div>
+          <!-- 最终指标 -->
+          <div class="bg-surface-container-lowest rounded-lg p-3">
+            <p class="text-xs text-on-surface-variant mb-2">训练最终指标</p>
+            <div class="grid grid-cols-2 gap-2">
+              <div class="text-center">
+                <div class="text-xs text-on-surface-variant">准确率</div>
+                <div id="final-accuracy" class="text-sm font-semibold text-success slider-label">—</div>
+              </div>
+              <div class="text-center">
+                <div class="text-xs text-on-surface-variant">精确率</div>
+                <div id="final-precision" class="text-sm font-semibold text-primary slider-label">—</div>
+              </div>
+              <div class="text-center">
+                <div class="text-xs text-on-surface-variant">召回率</div>
+                <div id="final-recall" class="text-sm font-semibold text-warning slider-label">—</div>
+              </div>
+              <div class="text-center">
+                <div class="text-xs text-on-surface-variant">F1分数</div>
+                <div id="final-f1" class="text-sm font-semibold text-error slider-label">—</div>
+              </div>
             </div>
           </div>
         </div>
-      </main>
+      </div>
+    </section>
+
+    <!-- Sigmoid + 评估 并排 -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+      <!-- 模块四：Sigmoid 函数可视化 -->
+      <section id="sigmoid-section" class="bg-surface rounded-xl shadow-card p-5">
+        <h2 class="text-base font-semibold text-on-surface mb-1">Sigmoid函数: σ(z) = 1/(1+e⁻ᶻ)</h2>
+        <p class="text-xs text-on-surface-variant mb-3">概率是怎么挤压出来的</p>
+        <div class="rounded-lg overflow-hidden bg-surface-container-lowest">
+          <canvas id="sigmoid-canvas" width="500" height="320"></canvas>
+        </div>
+        <p class="text-xs text-on-surface-variant mt-2">当z=0时，概率为0.5——这就是决策边界</p>
+      </section>
+
+      <!-- 模块五：评估仪表盘 -->
+      <section id="eval-section" class="bg-surface rounded-xl shadow-card p-5">
+        <h2 class="text-base font-semibold text-on-surface mb-4">模型到底行不行</h2>
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <!-- 混淆矩阵 -->
+          <div>
+            <p class="text-xs text-on-surface-variant mb-2 text-center">混淆矩阵</p>
+            <div class="grid grid-cols-2 gap-1">
+              <div class="bg-success/20 rounded-md p-3 text-center">
+                <div class="text-xs text-success/80">TP</div>
+                <div id="val-tp" class="text-lg font-bold text-success">0</div>
+              </div>
+              <div class="bg-error/20 rounded-md p-3 text-center">
+                <div class="text-xs text-error/80">FP</div>
+                <div id="val-fp" class="text-lg font-bold text-error">0</div>
+              </div>
+              <div class="bg-error/20 rounded-md p-3 text-center">
+                <div class="text-xs text-error/80">FN</div>
+                <div id="val-fn" class="text-lg font-bold text-error">0</div>
+              </div>
+              <div class="bg-success/20 rounded-md p-3 text-center">
+                <div class="text-xs text-success/80">TN</div>
+                <div id="val-tn" class="text-lg font-bold text-success">0</div>
+              </div>
+            </div>
+          </div>
+          <!-- 指标卡片 -->
+          <div class="flex flex-col gap-2">
+            <div class="bg-surface-container-lowest rounded-lg p-2.5 flex justify-between items-center">
+              <span class="text-xs text-on-surface-variant">准确率</span>
+              <span id="eval-accuracy" class="text-sm font-semibold text-success slider-label">50.00%</span>
+            </div>
+            <div class="bg-surface-container-lowest rounded-lg p-2.5 flex justify-between items-center">
+              <span class="text-xs text-on-surface-variant">精确率</span>
+              <span id="eval-precision" class="text-sm font-semibold text-primary slider-label">0.00</span>
+            </div>
+            <div class="bg-surface-container-lowest rounded-lg p-2.5 flex justify-between items-center">
+              <span class="text-xs text-on-surface-variant">召回率</span>
+              <span id="eval-recall" class="text-sm font-semibold text-warning slider-label">0.00</span>
+            </div>
+            <div class="bg-surface-container-lowest rounded-lg p-2.5 flex justify-between items-center">
+              <span class="text-xs text-on-surface-variant">F1分数</span>
+              <span id="eval-f1" class="text-sm font-semibold text-error slider-label">0.00</span>
+            </div>
+          </div>
+        </div>
+        <!-- ROC 曲线 -->
+        <div class="rounded-lg overflow-hidden bg-surface-container-lowest mb-3">
+          <canvas id="roc-canvas" width="400" height="220"></canvas>
+        </div>
+        <!-- 知识提示 -->
+        <div class="bg-primary/10 rounded-lg p-3 border border-primary/20">
+          <div class="flex items-start gap-2">
+            <i data-lucide="lightbulb" class="w-4 h-4 text-primary shrink-0 mt-0.5"></i>
+            <p class="text-xs text-on-surface-variant">当正负样本不平衡时，准确率可能具有欺骗性——此时应关注精确率和召回率</p>
+          </div>
+        </div>
+      </section>
     </div>
-  </body>
+
+  </main>
+  <!-- @main-content:end -->
+
+  <script>
+  $(function() {
+    // ========== 状态变量 ==========
+    let dataPoints = []; // {x, y, label}  label: 0=良性, 1=恶性
+    let w1 = 0.5, w2 = -0.5, b = 0;
+    let trainingInterval = null;
+    let lossHistory = [];
+    let isTraining = false;
+
+    // ========== 预设数据 ==========
+    const presetLinear = [
+      {x:1.5,y:20,label:0},{x:2.0,y:25,label:0},{x:2.5,y:30,label:0},
+      {x:1.8,y:35,label:0},{x:3.0,y:22,label:0},{x:2.2,y:28,label:0},
+      {x:1.0,y:40,label:0},{x:2.8,y:32,label:0},{x:1.2,y:38,label:0},
+      {x:2.6,y:27,label:0},{x:3.5,y:42,label:0},{x:3.2,y:36,label:0},
+      {x:5.0,y:50,label:1},{x:6.0,y:55,label:1},{x:5.5,y:60,label:1},
+      {x:7.0,y:45,label:1},{x:6.5,y:52,label:1},{x:8.0,y:58,label:1},
+      {x:5.8,y:65,label:1},{x:7.5,y:48,label:1},{x:6.2,y:62,label:1},
+      {x:8.5,y:42,label:1},{x:7.2,y:56,label:1},{x:6.8,y:68,label:1}
+    ];
+
+    const presetNonlinear = [
+      {x:1.0,y:60,label:0},{x:1.5,y:55,label:0},{x:2.0,y:65,label:0},
+      {x:2.5,y:58,label:0},{x:1.2,y:50,label:0},{x:1.8,y:62,label:0},
+      {x:3.0,y:45,label:0},{x:2.2,y:48,label:0},{x:3.5,y:40,label:0},
+      {x:3.2,y:52,label:0},{x:2.8,y:55,label:0},{x:1.4,y:68,label:0},
+      {x:4.0,y:35,label:1},{x:4.5,y:42,label:1},{x:5.0,y:30,label:1},
+      {x:5.5,y:38,label:1},{x:6.0,y:25,label:1},{x:6.5,y:32,label:1},
+      {x:7.0,y:20,label:1},{x:7.5,y:28,label:1},{x:8.0,y:22,label:1},
+      {x:8.5,y:35,label:1},{x:4.8,y:28,label:1},{x:5.2,y:40,label:1},
+      {x:3.8,y:45,label:0},{x:4.2,y:48,label:1}
+    ];
+
+    const presetImbalanced = [
+      {x:1.5,y:22,label:0},{x:2.0,y:28,label:0},{x:1.8,y:35,label:0},
+      {x:2.5,y:30,label:0},{x:1.2,y:40,label:0},{x:2.8,y:25,label:0},
+      {x:3.0,y:32,label:0},{x:1.0,y:45,label:0},{x:2.2,y:38,label:0},
+      {x:3.5,y:20,label:0},{x:1.6,y:42,label:0},{x:2.4,y:36,label:0},
+      {x:3.2,y:28,label:0},{x:2.6,y:44,label:0},{x:1.4,y:33,label:0},
+      {x:3.8,y:26,label:0},{x:2.9,y:39,label:0},{x:1.1,y:48,label:0},
+      {x:2.1,y:31,label:0},{x:3.4,y:24,label:0},{x:1.7,y:37,label:0},
+      {x:7.0,y:55,label:1},{x:6.5,y:60,label:1},{x:8.0,y:50,label:1},
+      {x:7.5,y:58,label:1},{x:6.0,y:62,label:1}
+    ];
+
+    // ========== 工具函数 ==========
+    function sigmoid(z) {
+      if (z > 500) return 1;
+      if (z < -500) return 0;
+      return 1 / (1 + Math.exp(-z));
+    }
+
+    function predict(x, y) {
+      return sigmoid(w1 * x + w2 * y + b);
+    }
+
+    function computeLoss() {
+      if (dataPoints.length === 0) return 0.6931;
+      let totalLoss = 0;
+      dataPoints.forEach(function(p) {
+        const pred = predict(p.x, p.y);
+        const eps = 1e-7;
+        const pClamped = Math.max(eps, Math.min(1 - eps, pred));
+        totalLoss += -(p.label * Math.log(pClamped) + (1 - p.label) * Math.log(1 - pClamped));
+      });
+      return totalLoss / dataPoints.length;
+    }
+
+    function computeMetrics() {
+      if (dataPoints.length === 0) {
+        return { accuracy: 0.5, precision: 0, recall: 0, f1: 0, tp: 0, fp: 0, fn: 0, tn: 0 };
+      }
+      let tp = 0, fp = 0, fn = 0, tn = 0;
+      dataPoints.forEach(function(p) {
+        const pred = predict(p.x, p.y) >= 0.5 ? 1 : 0;
+        if (pred === 1 && p.label === 1) tp++;
+        else if (pred === 1 && p.label === 0) fp++;
+        else if (pred === 0 && p.label === 1) fn++;
+        else tn++;
+      });
+      const accuracy = (tp + tn) / dataPoints.length;
+      const precision = tp + fp > 0 ? tp / (tp + fp) : 0;
+      const recall = tp + fn > 0 ? tp / (tp + fn) : 0;
+      const f1 = precision + recall > 0 ? 2 * precision * recall / (precision + recall) : 0;
+      return { accuracy: accuracy, precision: precision, recall: recall, f1: f1, tp: tp, fp: fp, fn: fn, tn: tn };
+    }
+
+    // ========== Canvas 绘制：散点图 ==========
+    const scatterCanvas = $('#scatter-canvas')[0];
+    const scatterCtx = scatterCanvas.getContext('2d');
+    const scatterW = scatterCanvas.width;
+    const scatterH = scatterCanvas.height;
+    const scatterPad = { top: 30, right: 20, bottom: 50, left: 55 };
+    const scatterPlotW = scatterW - scatterPad.left - scatterPad.right;
+    const scatterPlotH = scatterH - scatterPad.top - scatterPad.bottom;
+    const xMin = 0, xMax = 10, yMin = 10, yMax = 80;
+
+    function scaleX(v) { return scatterPad.left + (v - xMin) / (xMax - xMin) * scatterPlotW; }
+    function scaleY(v) { return scatterPad.top + (1 - (v - yMin) / (yMax - yMin)) * scatterPlotH; }
+    function unscaleX(px) { return xMin + (px - scatterPad.left) / scatterPlotW * (xMax - xMin); }
+    function unscaleY(py) { return yMin + (1 - (py - scatterPad.top) / scatterPlotH) * (yMax - yMin); }
+
+    function drawScatter() {
+      const ctx = scatterCtx;
+      ctx.clearRect(0, 0, scatterW, scatterH);
+
+      // 背景
+      ctx.fillStyle = '#1E293B';
+      ctx.fillRect(0, 0, scatterW, scatterH);
+
+      // 绘制区域背景
+      ctx.fillStyle = '#0F172A';
+      ctx.fillRect(scatterPad.left, scatterPad.top, scatterPlotW, scatterPlotH);
+
+      // 决策边界区域填充
+      if (Math.abs(w2) > 0.001 || Math.abs(w1) > 0.001) {
+        drawDecisionRegions(ctx);
+      }
+
+      // 网格线
+      ctx.strokeStyle = 'rgba(71, 85, 105, 0.3)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 10; i++) {
+        const x = scaleX(i);
+        ctx.beginPath(); ctx.moveTo(x, scatterPad.top); ctx.lineTo(x, scatterPad.top + scatterPlotH); ctx.stroke();
+      }
+      for (let v = 10; v <= 80; v += 10) {
+        const y = scaleY(v);
+        ctx.beginPath(); ctx.moveTo(scatterPad.left, y); ctx.lineTo(scatterPad.left + scatterPlotW, y); ctx.stroke();
+      }
+
+      // 坐标轴
+      ctx.strokeStyle = '#64748B';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(scatterPad.left, scatterPad.top);
+      ctx.lineTo(scatterPad.left, scatterPad.top + scatterPlotH);
+      ctx.lineTo(scatterPad.left + scatterPlotW, scatterPad.top + scatterPlotH);
+      ctx.stroke();
+
+      // 决策边界线
+      drawDecisionBoundary(ctx);
+
+      // 数据点
+      dataPoints.forEach(function(p) {
+        const cx = scaleX(p.x);
+        const cy = scaleY(p.y);
+        ctx.beginPath();
+        ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+        ctx.fillStyle = p.label === 0 ? '#60A5FA' : '#F87171';
+        ctx.fill();
+        ctx.strokeStyle = p.label === 0 ? '#3B82F6' : '#EF4444';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      });
+
+      // 坐标轴标签
+      ctx.fillStyle = '#94A3B8';
+      ctx.font = '11px "Space Grotesk", "Noto Sans SC", sans-serif';
+      ctx.textAlign = 'center';
+      for (let i = 0; i <= 10; i += 2) {
+        ctx.fillText(i.toString(), scaleX(i), scatterPad.top + scatterPlotH + 18);
+      }
+      ctx.textAlign = 'right';
+      for (let v = 10; v <= 80; v += 10) {
+        ctx.fillText(v.toString(), scatterPad.left - 8, scaleY(v) + 4);
+      }
+      // 轴标题
+      ctx.fillStyle = '#CBD5E1';
+      ctx.font = '12px "Noto Sans SC", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('肿瘤大小(cm)', scatterPad.left + scatterPlotW / 2, scatterH - 6);
+      ctx.save();
+      ctx.translate(14, scatterPad.top + scatterPlotH / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText('患者年龄(岁)', 0, 0);
+      ctx.restore();
+    }
+
+    function drawDecisionRegions(ctx) {
+      // 在决策边界两侧填充半透明色块
+      const step = 4;
+      for (let px = scatterPad.left; px < scatterPad.left + scatterPlotW; px += step) {
+        for (let py = scatterPad.top; py < scatterPad.top + scatterPlotH; py += step) {
+          const dataX = unscaleX(px);
+          const dataY = unscaleY(py);
+          const z = w1 * dataX + w2 * dataY + b;
+          const prob = sigmoid(z);
+          if (prob < 0.5) {
+            ctx.fillStyle = 'rgba(96, 165, 250, 0.06)';
+          } else {
+            ctx.fillStyle = 'rgba(248, 113, 113, 0.06)';
+          }
+          ctx.fillRect(px, py, step, step);
+        }
+      }
+    }
+
+    function drawDecisionBoundary(ctx) {
+      if (Math.abs(w1) < 0.001 && Math.abs(w2) < 0.001) return;
+
+      const pts = [];
+      // w1*x + w2*y + b = 0 → y = -(w1*x + b)/w2
+      if (Math.abs(w2) > 0.001) {
+        for (let dataX = xMin; dataX <= xMax; dataX += 0.1) {
+          const dataY = -(w1 * dataX + b) / w2;
+          if (dataY >= yMin && dataY <= yMax) {
+            pts.push({ px: scaleX(dataX), py: scaleY(dataY) });
+          }
+        }
+      } else if (Math.abs(w1) > 0.001) {
+        const dataX = -b / w1;
+        if (dataX >= xMin && dataX <= xMax) {
+          pts.push({ px: scaleX(dataX), py: scatterPad.top });
+          pts.push({ px: scaleX(dataX), py: scatterPad.top + scatterPlotH });
+        }
+      }
+
+      if (pts.length >= 2) {
+        ctx.beginPath();
+        ctx.moveTo(pts[0].px, pts[0].py);
+        for (let i = 1; i < pts.length; i++) {
+          ctx.lineTo(pts[i].px, pts[i].py);
+        }
+        ctx.strokeStyle = '#2DD4BF';
+        ctx.lineWidth = 2.5;
+        ctx.setLineDash([8, 4]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+    }
+
+    // ========== Canvas 绘制：损失曲线 ==========
+    const lossCanvas = $('#loss-canvas')[0];
+    const lossCtx = lossCanvas.getContext('2d');
+    const lossW = lossCanvas.width;
+    const lossH = lossCanvas.height;
+    const lossPad = { top: 25, right: 20, bottom: 40, left: 55 };
+
+    function drawLossChart() {
+      const ctx = lossCtx;
+      ctx.clearRect(0, 0, lossW, lossH);
+      ctx.fillStyle = '#1E293B';
+      ctx.fillRect(0, 0, lossW, lossH);
+
+      const plotW = lossW - lossPad.left - lossPad.right;
+      const plotH = lossH - lossPad.top - lossPad.bottom;
+
+      ctx.fillStyle = '#0F172A';
+      ctx.fillRect(lossPad.left, lossPad.top, plotW, plotH);
+
+      // 坐标轴
+      ctx.strokeStyle = '#64748B';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(lossPad.left, lossPad.top);
+      ctx.lineTo(lossPad.left, lossPad.top + plotH);
+      ctx.lineTo(lossPad.left + plotW, lossPad.top + plotH);
+      ctx.stroke();
+
+      if (lossHistory.length < 2) {
+        ctx.fillStyle = '#64748B';
+        ctx.font = '12px "Noto Sans SC", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('训练开始后将显示损失曲线', lossW / 2, lossH / 2);
+
+        // 轴标签
+        ctx.fillStyle = '#94A3B8';
+        ctx.font = '11px "Noto Sans SC", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('迭代步数', lossPad.left + plotW / 2, lossH - 6);
+        ctx.save();
+        ctx.translate(14, lossPad.top + plotH / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillText('损失值', 0, 0);
+        ctx.restore();
+        return;
+      }
+
+      const maxLoss = Math.max.apply(null, lossHistory) * 1.1;
+      const minLoss = 0;
+      const maxStep = lossHistory.length;
+
+      function lossX(i) { return lossPad.left + (i / (maxStep - 1)) * plotW; }
+      function lossY(v) { return lossPad.top + (1 - (v - minLoss) / (maxLoss - minLoss)) * plotH; }
+
+      // 网格
+      ctx.strokeStyle = 'rgba(71, 85, 105, 0.3)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 5; i++) {
+        const y = lossPad.top + (i / 5) * plotH;
+        ctx.beginPath(); ctx.moveTo(lossPad.left, y); ctx.lineTo(lossPad.left + plotW, y); ctx.stroke();
+        ctx.fillStyle = '#94A3B8';
+        ctx.font = '10px "Space Grotesk", sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText((maxLoss * (1 - i / 5)).toFixed(2), lossPad.left - 6, y + 3);
+      }
+
+      // 绘制曲线
+      ctx.beginPath();
+      ctx.moveTo(lossX(0), lossY(lossHistory[0]));
+      for (let i = 1; i < lossHistory.length; i++) {
+        ctx.lineTo(lossX(i), lossY(lossHistory[i]));
+      }
+      ctx.strokeStyle = '#2DD4BF';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // 渐变填充
+      const grad = ctx.createLinearGradient(0, lossPad.top, 0, lossPad.top + plotH);
+      grad.addColorStop(0, 'rgba(45, 212, 191, 0.2)');
+      grad.addColorStop(1, 'rgba(45, 212, 191, 0)');
+      ctx.lineTo(lossX(lossHistory.length - 1), lossPad.top + plotH);
+      ctx.lineTo(lossX(0), lossPad.top + plotH);
+      ctx.closePath();
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // 轴标签
+      ctx.fillStyle = '#94A3B8';
+      ctx.font = '11px "Noto Sans SC", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('迭代步数', lossPad.left + plotW / 2, lossH - 6);
+      ctx.save();
+      ctx.translate(14, lossPad.top + plotH / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText('损失值', 0, 0);
+      ctx.restore();
+
+      // x轴刻度
+      ctx.textAlign = 'center';
+      const stepLabels = [0, Math.floor(maxStep / 4), Math.floor(maxStep / 2), Math.floor(maxStep * 3 / 4), maxStep - 1];
+      stepLabels.forEach(function(s) {
+        if (s < lossHistory.length) {
+          ctx.fillText(s.toString(), lossX(s), lossPad.top + plotH + 16);
+        }
+      });
+    }
+
+    // ========== Canvas 绘制：Sigmoid ==========
+    const sigmoidCanvas = $('#sigmoid-canvas')[0];
+    const sigmoidCtx = sigmoidCanvas.getContext('2d');
+    const sigW = sigmoidCanvas.width;
+    const sigH = sigmoidCanvas.height;
+    const sigPad = { top: 20, right: 20, bottom: 40, left: 50 };
+
+    function drawSigmoid() {
+      const ctx = sigmoidCtx;
+      ctx.clearRect(0, 0, sigW, sigH);
+      ctx.fillStyle = '#1E293B';
+      ctx.fillRect(0, 0, sigW, sigH);
+
+      const plotW = sigW - sigPad.left - sigPad.right;
+      const plotH = sigH - sigPad.top - sigPad.bottom;
+      const zMin = -8, zMax = 8;
+
+      ctx.fillStyle = '#0F172A';
+      ctx.fillRect(sigPad.left, sigPad.top, plotW, plotH);
+
+      function sigPx(z) { return sigPad.left + (z - zMin) / (zMax - zMin) * plotW; }
+      function sigPy(v) { return sigPad.top + (1 - v) * plotH; }
+
+      // 填充区域
+      ctx.beginPath();
+      ctx.moveTo(sigPx(zMin), sigPy(0.5));
+      for (let z = zMin; z <= 0; z += 0.1) {
+        ctx.lineTo(sigPx(z), sigPy(sigmoid(z)));
+      }
+      ctx.lineTo(sigPx(0), sigPy(0.5));
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(96, 165, 250, 0.12)';
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(sigPx(0), sigPy(0.5));
+      for (let z = 0; z <= zMax; z += 0.1) {
+        ctx.lineTo(sigPx(z), sigPy(sigmoid(z)));
+      }
+      ctx.lineTo(sigPx(zMax), sigPy(0.5));
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(248, 113, 113, 0.12)';
+      ctx.fill();
+
+      // z=0 虚线
+      ctx.beginPath();
+      ctx.moveTo(sigPx(0), sigPad.top);
+      ctx.lineTo(sigPx(0), sigPad.top + plotH);
+      ctx.strokeStyle = 'rgba(148, 163, 184, 0.5)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // 0.5 水平虚线
+      ctx.beginPath();
+      ctx.moveTo(sigPad.left, sigPy(0.5));
+      ctx.lineTo(sigPad.left + plotW, sigPy(0.5));
+      ctx.strokeStyle = 'rgba(148, 163, 184, 0.5)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Sigmoid 曲线
+      ctx.beginPath();
+      ctx.moveTo(sigPx(zMin), sigPy(sigmoid(zMin)));
+      for (let z = zMin; z <= zMax; z += 0.05) {
+        ctx.lineTo(sigPx(z), sigPy(sigmoid(z)));
+      }
+      ctx.strokeStyle = '#2DD4BF';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+
+      // 坐标轴
+      ctx.strokeStyle = '#64748B';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(sigPad.left, sigPad.top);
+      ctx.lineTo(sigPad.left, sigPad.top + plotH);
+      ctx.lineTo(sigPad.left + plotW, sigPad.top + plotH);
+      ctx.stroke();
+
+      // 刻度标签
+      ctx.fillStyle = '#94A3B8';
+      ctx.font = '10px "Space Grotesk", sans-serif';
+      ctx.textAlign = 'center';
+      [-6, -4, -2, 0, 2, 4, 6].forEach(function(z) {
+        ctx.fillText(z.toString(), sigPx(z), sigPad.top + plotH + 16);
+      });
+      ctx.textAlign = 'right';
+      [0, 0.25, 0.5, 0.75, 1.0].forEach(function(v) {
+        ctx.fillText(v.toFixed(2), sigPad.left - 6, sigPy(v) + 3);
+      });
+
+      // 轴标题
+      ctx.fillStyle = '#CBD5E1';
+      ctx.font = '12px "Noto Sans SC", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('z', sigPad.left + plotW / 2, sigH - 4);
+      ctx.save();
+      ctx.translate(12, sigPad.top + plotH / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText('σ(z)', 0, 0);
+      ctx.restore();
+    }
+
+    // ========== Canvas 绘制：ROC 曲线 ==========
+    const rocCanvas = $('#roc-canvas')[0];
+    const rocCtx = rocCanvas.getContext('2d');
+    const rocW = rocCanvas.width;
+    const rocH = rocCanvas.height;
+    const rocPad = { top: 20, right: 20, bottom: 40, left: 50 };
+
+    function drawROC() {
+      const ctx = rocCtx;
+      ctx.clearRect(0, 0, rocW, rocH);
+      ctx.fillStyle = '#1E293B';
+      ctx.fillRect(0, 0, rocW, rocH);
+
+      const plotW = rocW - rocPad.left - rocPad.right;
+      const plotH = rocH - rocPad.top - rocPad.bottom;
+
+      ctx.fillStyle = '#0F172A';
+      ctx.fillRect(rocPad.left, rocPad.top, plotW, plotH);
+
+      function rocPx(v) { return rocPad.left + v * plotW; }
+      function rocPy(v) { return rocPad.top + (1 - v) * plotH; }
+
+      // 对角虚线
+      ctx.beginPath();
+      ctx.moveTo(rocPx(0), rocPy(0));
+      ctx.lineTo(rocPx(1), rocPy(1));
+      ctx.strokeStyle = 'rgba(148, 163, 184, 0.4)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // 计算 ROC 曲线点
+      if (dataPoints.length > 0) {
+        const thresholds = [];
+        for (let t = 0; t <= 1.001; t += 0.02) { thresholds.push(t); }
+        thresholds.push(1.01);
+
+        const rocPoints = [];
+        thresholds.forEach(function(thr) {
+          let tp = 0, fp = 0, fn = 0, tn = 0;
+          dataPoints.forEach(function(p) {
+            const pred = predict(p.x, p.y) >= thr ? 1 : 0;
+            if (pred === 1 && p.label === 1) tp++;
+            else if (pred === 1 && p.label === 0) fp++;
+            else if (pred === 0 && p.label === 1) fn++;
+            else tn++;
+          });
+          const tpr = tp + fn > 0 ? tp / (tp + fn) : 0;
+          const fpr = fp + tn > 0 ? fp / (fp + tn) : 0;
+          rocPoints.push({ fpr: fpr, tpr: tpr });
+        });
+
+        // 排序
+        rocPoints.sort(function(a, b) { return a.fpr - b.fpr || a.tpr - b.tpr; });
+
+        // 绘制曲线
+        ctx.beginPath();
+        ctx.moveTo(rocPx(0), rocPy(0));
+        rocPoints.forEach(function(pt) {
+          ctx.lineTo(rocPx(pt.fpr), rocPy(pt.tpr));
+        });
+        ctx.lineTo(rocPx(1), rocPy(1));
+        ctx.strokeStyle = '#2DD4BF';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // AUC 填充
+        ctx.lineTo(rocPx(1), rocPy(0));
+        ctx.lineTo(rocPx(0), rocPy(0));
+        ctx.closePath();
+        const grad = ctx.createLinearGradient(0, rocPad.top, 0, rocPad.top + plotH);
+        grad.addColorStop(0, 'rgba(45, 212, 191, 0.15)');
+        grad.addColorStop(1, 'rgba(45, 212, 191, 0.02)');
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        // 计算 AUC
+        let auc = 0;
+        for (let i = 1; i < rocPoints.length; i++) {
+          auc += (rocPoints[i].fpr - rocPoints[i - 1].fpr) * (rocPoints[i].tpr + rocPoints[i - 1].tpr) / 2;
+        }
+        // AUC 显示
+        ctx.fillStyle = '#2DD4BF';
+        ctx.font = 'bold 12px "Space Grotesk", sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText('AUC = ' + auc.toFixed(3), rocPad.left + 8, rocPad.top + 16);
+      }
+
+      // 坐标轴
+      ctx.strokeStyle = '#64748B';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(rocPad.left, rocPad.top);
+      ctx.lineTo(rocPad.left, rocPad.top + plotH);
+      ctx.lineTo(rocPad.left + plotW, rocPad.top + plotH);
+      ctx.stroke();
+
+      // 刻度
+      ctx.fillStyle = '#94A3B8';
+      ctx.font = '10px "Space Grotesk", sans-serif';
+      ctx.textAlign = 'center';
+      [0, 0.25, 0.5, 0.75, 1.0].forEach(function(v) {
+        ctx.fillText(v.toFixed(1), rocPx(v), rocPad.top + plotH + 16);
+      });
+      ctx.textAlign = 'right';
+      [0, 0.25, 0.5, 0.75, 1.0].forEach(function(v) {
+        ctx.fillText(v.toFixed(1), rocPad.left - 6, rocPy(v) + 3);
+      });
+
+      // 轴标题
+      ctx.fillStyle = '#CBD5E1';
+      ctx.font = '11px "Noto Sans SC", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('FPR (假阳性率)', rocPad.left + plotW / 2, rocH - 4);
+      ctx.save();
+      ctx.translate(12, rocPad.top + plotH / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText('TPR (真阳性率)', 0, 0);
+      ctx.restore();
+    }
+
+    // ========== 更新所有 UI ==========
+    function updateUI() {
+      // 滑块值显示
+      $('#val-w1').text(w1.toFixed(2));
+      $('#val-w2').text(w2.toFixed(2));
+      $('#val-b').text(b.toFixed(2));
+
+      // 样本计数
+      const benign = dataPoints.filter(function(p) { return p.label === 0; }).length;
+      const malignant = dataPoints.filter(function(p) { return p.label === 1; }).length;
+      $('#sample-count').text('良性 ' + benign + ' 个 / 恶性 ' + malignant + ' 个');
+
+      // 指标计算
+      const metrics = computeMetrics();
+      const loss = computeLoss();
+
+      $('#current-accuracy').text((metrics.accuracy * 100).toFixed(2) + '%');
+      $('#current-loss').text(loss.toFixed(4));
+
+      // 评估仪表盘
+      $('#val-tp').text(metrics.tp);
+      $('#val-fp').text(metrics.fp);
+      $('#val-fn').text(metrics.fn);
+      $('#val-tn').text(metrics.tn);
+      $('#eval-accuracy').text((metrics.accuracy * 100).toFixed(2) + '%');
+      $('#eval-precision').text(metrics.precision.toFixed(2));
+      $('#eval-recall').text(metrics.recall.toFixed(2));
+      $('#eval-f1').text(metrics.f1.toFixed(2));
+
+      // 绘制
+      drawScatter();
+      drawROC();
+    }
+
+    // ========== 事件绑定：滑块 ==========
+    $('#slider-w1').on('input', function() {
+      w1 = parseFloat($(this).val());
+      updateUI();
+    });
+    $('#slider-w2').on('input', function() {
+      w2 = parseFloat($(this).val());
+      updateUI();
+    });
+    $('#slider-b').on('input', function() {
+      b = parseFloat($(this).val());
+      updateUI();
+    });
+
+    // ========== 事件绑定：重置参数 ==========
+    $('#btn-reset-params').on('click', function() {
+      w1 = 0.5; w2 = -0.5; b = 0;
+      $('#slider-w1').val(w1);
+      $('#slider-w2').val(w2);
+      $('#slider-b').val(b);
+      if (isTraining) {
+        clearInterval(trainingInterval);
+        isTraining = false;
+        $('#training-status').text('训练已停止');
+        $('#btn-start-train').text('开始训练');
+      }
+      lossHistory = [];
+      drawLossChart();
+      updateUI();
+    });
+
+    // ========== 事件绑定：预设数据 ==========
+    $('#btn-linear').on('click', function() {
+      dataPoints = presetLinear.map(function(p) { return { x: p.x, y: p.y, label: p.label }; });
+      w1 = 0.5; w2 = -0.5; b = 0;
+      $('#slider-w1').val(w1);
+      $('#slider-w2').val(w2);
+      $('#slider-b').val(b);
+      lossHistory = [];
+      drawLossChart();
+      if (isTraining) {
+        clearInterval(trainingInterval);
+        isTraining = false;
+        $('#btn-start-train').text('开始训练');
+      }
+      $('#training-status').text('已加载线性可分数据');
+      $('#final-accuracy').text('—');
+      $('#final-precision').text('—');
+      $('#final-recall').text('—');
+      $('#final-f1').text('—');
+      updateUI();
+    });
+
+    $('#btn-nonlinear').on('click', function() {
+      dataPoints = presetNonlinear.map(function(p) { return { x: p.x, y: p.y, label: p.label }; });
+      w1 = 0.5; w2 = -0.5; b = 0;
+      $('#slider-w1').val(w1);
+      $('#slider-w2').val(w2);
+      $('#slider-b').val(b);
+      lossHistory = [];
+      drawLossChart();
+      if (isTraining) {
+        clearInterval(trainingInterval);
+        isTraining = false;
+        $('#btn-start-train').text('开始训练');
+      }
+      $('#training-status').text('已加载非线性数据');
+      $('#final-accuracy').text('—');
+      $('#final-precision').text('—');
+      $('#final-recall').text('—');
+      $('#final-f1').text('—');
+      updateUI();
+    });
+
+    $('#btn-imbalanced').on('click', function() {
+      dataPoints = presetImbalanced.map(function(p) { return { x: p.x, y: p.y, label: p.label }; });
+      w1 = 0.5; w2 = -0.5; b = 0;
+      $('#slider-w1').val(w1);
+      $('#slider-w2').val(w2);
+      $('#slider-b').val(b);
+      lossHistory = [];
+      drawLossChart();
+      if (isTraining) {
+        clearInterval(trainingInterval);
+        isTraining = false;
+        $('#btn-start-train').text('开始训练');
+      }
+      $('#training-status').text('已加载不平衡数据');
+      $('#final-accuracy').text('—');
+      $('#final-precision').text('—');
+      $('#final-recall').text('—');
+      $('#final-f1').text('—');
+      updateUI();
+    });
+
+    // ========== 事件绑定：Canvas 点击添加数据 ==========
+    $('#scatter-canvas').on('click', function(e) {
+      const rect = this.getBoundingClientRect();
+      const px = (e.clientX - rect.left) * (scatterW / rect.width);
+      const py = (e.clientY - rect.top) * (scatterH / rect.height);
+      if (px >= scatterPad.left && px <= scatterPad.left + scatterPlotW &&
+          py >= scatterPad.top && py <= scatterPad.top + scatterPlotH) {
+        const dataX = unscaleX(px);
+        const dataY = unscaleY(py);
+        dataPoints.push({ x: dataX, y: dataY, label: 0 }); // 左键=良性
+        updateUI();
+      }
+    });
+
+    $('#scatter-canvas').on('contextmenu', function(e) {
+      e.preventDefault();
+      const rect = this.getBoundingClientRect();
+      const px = (e.clientX - rect.left) * (scatterW / rect.width);
+      const py = (e.clientY - rect.top) * (scatterH / rect.height);
+      if (px >= scatterPad.left && px <= scatterPad.left + scatterPlotW &&
+          py >= scatterPad.top && py <= scatterPad.top + scatterPlotH) {
+        const dataX = unscaleX(px);
+        const dataY = unscaleY(py);
+        dataPoints.push({ x: dataX, y: dataY, label: 1 }); // 右键=恶性
+        updateUI();
+      }
+    });
+
+    // ========== 事件绑定：开始训练 ==========
+    $('#btn-start-train').on('click', function() {
+      if (isTraining) {
+        clearInterval(trainingInterval);
+        isTraining = false;
+        $(this).text('开始训练');
+        $('#training-status').text('训练已暂停');
+        return;
+      }
+
+      if (dataPoints.length === 0) {
+        $('#training-status').text('请先添加数据或加载预设');
+        return;
+      }
+
+      isTraining = true;
+      $(this).text('停止训练');
+      $('#training-status').text('训练中...');
+      lossHistory = [];
+
+      const lr = parseFloat($('input[name="learning-rate"]:checked').val());
+      const maxSteps = 200;
+      let step = 0;
+
+      trainingInterval = setInterval(function() {
+        if (step >= maxSteps || !isTraining) {
+          clearInterval(trainingInterval);
+          isTraining = false;
+          $('#btn-start-train').text('开始训练');
+          $('#training-status').text('训练完成');
+
+          // 显示最终指标
+          const metrics = computeMetrics();
+          $('#final-accuracy').text((metrics.accuracy * 100).toFixed(2) + '%');
+          $('#final-precision').text(metrics.precision.toFixed(2));
+          $('#final-recall').text(metrics.recall.toFixed(2));
+          $('#final-f1').text(metrics.f1.toFixed(2));
+          return;
+        }
+
+        // 梯度下降一步
+        let dw1 = 0, dw2 = 0, db = 0;
+        const n = dataPoints.length;
+        dataPoints.forEach(function(p) {
+          const pred = predict(p.x, p.y);
+          const error = pred - p.label;
+          dw1 += error * p.x;
+          dw2 += error * p.y;
+          db += error;
+        });
+        dw1 /= n;
+        dw2 /= n;
+        db /= n;
+
+        w1 -= lr * dw1;
+        w2 -= lr * dw2;
+        b -= lr * db;
+
+        // 更新滑块
+        w1 = Math.max(-5, Math.min(5, w1));
+        w2 = Math.max(-5, Math.min(5, w2));
+        b = Math.max(-10, Math.min(10, b));
+        $('#slider-w1').val(w1);
+        $('#slider-w2').val(w2);
+        $('#slider-b').val(b);
+
+        // 记录损失
+        lossHistory.push(computeLoss());
+
+        step++;
+        $('#training-status').text('训练中... 步骤 ' + step + '/' + maxSteps);
+
+        updateUI();
+        drawLossChart();
+      }, 50);
+    });
+
+    // ========== 初始化 ==========
+    // 默认加载线性可分数据
+    dataPoints = presetLinear.map(function(p) { return { x: p.x, y: p.y, label: p.label }; });
+    $('#training-status').text('已加载线性可分数据');
+
+    drawScatter();
+    drawLossChart();
+    drawSigmoid();
+    drawROC();
+    updateUI();
+  });
+  </script>
+
+  <script>lucide.createIcons();</script>
+</body>
+
 </html>
